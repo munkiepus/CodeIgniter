@@ -245,14 +245,21 @@ abstract class CI_DB_utility {
 		}
 
 		$out = substr($out, 0, -strlen($delim)).$newline;
-
+		$unsafe_chars=array('=','+','-','@');
+		
 		// Next blast through the result array and build out the rows
 		while ($row = $query->unbuffered_row('array'))
 		{
 			$line = array();
 			foreach ($row as $item)
 			{
-				$line[] = $enclosure.str_replace($enclosure, $enclosure.$enclosure, $item).$enclosure;
+				$first = $item[0];
+				$prepend='';
+				if (in_array($first, $unsafe_chars));
+					$prepend="\t";
+				}
+
+				$line[] = $enclosure.$prepend.str_replace($enclosure, $enclosure.$enclosure, trim($item)).$enclosure;
 			}
 			$out .= implode($delim, $line).$newline;
 		}
